@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f5f4ef">
+<title>しんどさ観察ログ</title>
+<style>
+:root {
+  --bg:#f5f4ef; --card:#fff; --ink:#292d29;
+  --muted:#747970; --line:#e3e4dc;
+  --green:#526b58; --soft:#e8eee8;
+  --red:#a34e47; --good:#41724e;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",
+  "Noto Sans JP",sans-serif;line-height:1.6;
+}
+header,main {max-width:850px;margin:auto}
+header {padding:24px 16px 12px}
+h1 {font-size:1.45rem;margin:0}
+h2 {font-size:1.12rem;margin:0 0 12px}
+h3 {font-size:1rem}
+p {margin:6px 0}
+small,.muted {color:var(--muted)}
+main {padding:0 12px 50px}
+nav {display:flex;gap:5px;background:#e8e7e0;padding:5px;
+  border-radius:13px;position:sticky;top:0;z-index:5;margin-bottom:14px}
+nav button {flex:1;border:0;background:transparent;padding:11px 3px;
+  border-radius:9px;font-weight:bold;color:#62665f}
+nav button.active {background:white;color:var(--ink)}
+.panel {display:none}
+.panel.active {display:block}
+.card {background:var(--card);border:1px solid var(--line);
+  border-radius:17px;padding:16px;margin-bottom:12px}
+label {display:block;font-weight:650;margin-bottom:6px;font-size:.93rem}
+.field {margin-bottom:18px}
+input,textarea,select {
+  width:100%;padding:11px;border:1px solid #d7d9d1;
+  border-radius:10px;background:white;color:var(--ink);font:inherit;
+}
+input[type=range] {padding:0;accent-color:var(--green)}
+textarea {min-height:85px;resize:vertical}
+button {font:inherit;cursor:pointer}
+.btn {border:1px solid #d5d8cf;border-radius:10px;background:white;
+  padding:10px 13px;color:var(--ink);font-weight:650}
+.btn.primary {background:var(--green);color:white;border-color:var(--green)}
+.btn.danger {color:var(--red)}
+.btn.small {font-size:.83rem;padding:6px 9px}
+.row {display:flex;align-items:center;gap:8px}
+.row .grow {flex:1;min-width:0}
+.pills {display:flex;flex-wrap:wrap;gap:7px}
+.pill {border:1px solid #d5d8cf;background:white;border-radius:20px;
+  padding:8px 12px;font-size:.9rem}
+.pill.selected {background:var(--soft);border-color:#91a895}
+.scoreline {display:flex;align-items:center;gap:12px}
+.scoreline input {flex:1;min-width:0}
+.score {font-size:1.35rem;font-weight:bold;min-width:42px;text-align:right}
+.scale {display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem}
+.notice {padding:12px;background:#f0f1eb;border-radius:11px}
+.delta {font-size:1.55rem;font-weight:800}
+.good {color:var(--good)} .bad {color:var(--red)}
+.change {display:grid;grid-template-columns:minmax(0,1fr) auto auto;
+  gap:6px;align-items:center;margin:9px 0}
+.change input {padding:8px}
+.segment {display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.segment button {border:0;background:white;padding:8px;font-size:.82rem}
+.segment button.on {background:var(--soft);font-weight:bold}
+.segment button.up.on {background:#f7e8e5;color:var(--red)}
+.segment button.down.on {background:#e7f1e8;color:var(--good)}
+.toolbar {display:flex;gap:8px;flex-wrap:wrap}
+.toolbar>* {flex:1}
+.item {border:1px solid var(--line);border-radius:13px;padding:13px;margin:9px 0;background:white}
+.itemtop {display:flex;justify-content:space-between;gap:8px}
+.tag {display:inline-block;background:#efefe9;border-radius:15px;
+  padding:3px 8px;font-size:.78rem;margin:3px 3px 0 0}
+.metrics {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.metric {background:white;border:1px solid var(--line);border-radius:13px;padding:12px}
+.metric .value {font-size:1.35rem;font-weight:800}
+.metric .caption {font-size:.8rem;color:var(--muted)}
+.bar {height:8px;background:#eeeee8;border-radius:9px;overflow:hidden;margin:6px 0}
+.bar span {display:block;height:100%;background:var(--green)}
+.bar span.negative {background:var(--red)}
+.empty {text-align:center;color:var(--muted);padding:20px 8px}
+.hint {font-size:.82rem;color:var(--muted)}
+.hidden {display:none!important}
+@media(min-width:600px) {
+  .metrics {grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>しんどさ観察ログ</h1>
+  <p class="muted">記録して、傾向を見つけて、自分の取扱説明書を作る。</p>
+</header>
+<main>
+<nav>
+  <button class="active" data-tab="record">記録</button>
+  <button data-tab="history">履歴</button>
+  <button data-tab="analysis">分析</button>
+</nav>
+
+<section id="record" class="panel active">
+<form id="form">
+<input type="hidden" id="editId">
+
+<div class="card">
+<h2>1. 何をした？</h2>
+<div class="field">
+<label>行動（複数選択可）</label>
+<div id="actions" class="pills"></div>
+<div class="row" style="margin-top:10px">
+  <div class="grow"><input id="newAction" placeholder="行動を追加"></div>
+  <button class="btn" type="button" id="addAction">追加</button>
+</div>
+<p class="hint">自分で追加した行動は、次回以降も選択できます。</p>
+</div>
+<div class="field">
+<label for="duration">実施時間（任意・分）</label>
+<input id="duration" type="number" min="0" placeholder="例：30">
+</div>
+<div class="field" style="margin-bottom:0">
+<label for="date">実施日時</label>
+<input id="date" type="datetime-local">
+</div>
+</div>
+
+<div class="card">
+<h2>2. しんどさ</h2>
+<p class="hint">0＝まったくしんどくない、100＝想像できる最大限のしんどさ</p>
+<div class="field">
+<label for="before">実施前</label>
+<div class="scoreline">
+<input id="before" type="range" min="0" max="100" value="50">
+<output id="beforeValue" class="score">50</output>
+</div>
+<div class="scale"><span>0</span><span>50</span><span>100</span></div>
+</div>
+<div class="field">
+<label for="after">実施後</label>
+<div class="scoreline">
+<input id="after" type="range" min="0" max="100" value="50">
+<output id="afterValue" class="score">50</output>
+</div>
+<div class="scale"><span>0</span><span>50</span><span>100</span></div>
+</div>
+<div class="notice">
+  変化量（実施後 − 実施前）
+  <div id="delta" class="delta">0点</div>
+  <span id="deltaText">変化なし</span>
+</div>
+</div>
+
+<div class="card">
+<h2>3. その他の変化</h2>
+<p class="hint">不安・達成感・疲労など、感じた変化を複数記録できます。</p>
+<div id="changes"></div>
+<div class="row" style="margin-top:10px">
+  <div class="grow"><input id="newState" placeholder="状態を追加（例：安心感）"></div>
+  <button class="btn" type="button" id="addState">追加</button>
+</div>
+</div>
+
+<div class="card">
+<h2>4. その他メモ</h2>
+<textarea id="memo" placeholder="気づいたこと、出来事、理由など"></textarea>
+</div>
+
+<div class="toolbar">
+<button type="button" class="btn hidden" id="cancel">編集をキャンセル</button>
+<button type="submit" class="btn primary" id="save">記録を保存</button>
+</div>
+</form>
+</section>
+
+<section id="history" class="panel">
+<div class="card">
+<h2>記録履歴</h2>
+<div class="row">
+  <div class="grow"><select id="filter"><option value="">すべての行動</option></select></div>
+  <button class="btn small" id="newRecord">新規記録</button>
+</div>
+<div id="records"></div>
+<hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+<div class="toolbar">
+<button class="btn" id="export">JSONバックアップ</button>
+<button class="btn" id="import">JSON復元</button>
+<input id="file" type="file" accept=".json,application/json" class="hidden">
+</div>
+<button class="btn danger" id="clear" style="width:100%;margin-top:9px">全記録を削除</button>
+<p class="hint">記録はこのブラウザ内に保存されます。端末変更やブラウザのデータ消去に備え、定期的にバックアップしてください。</p>
+</div>
+</section>
+
+<section id="analysis" class="panel">
+<div class="card">
+<h2>分析ダッシュボード</h2>
+<p class="hint">点数差は「実施後 − 実施前」。マイナスほど、直後にしんどさが軽減しています。</p>
+<label for="period">集計期間</label>
+<select id="period">
+<option value="all">全期間</option>
+<option value="7">直近7日</option>
+<option value="30">直近30日</option>
+<option value="90">直近90日</option>
+</select>
+<div id="overview" class="metrics" style="margin-top:12px"></div>
+</div>
+<div class="card"><h2>行動別の効果</h2><div id="byAction"></div></div>
+<div class="card"><h2>しんどさの程度別</h2><div id="bySeverity"></div></div>
+<div class="card"><h2>感情・状態別</h2><div id="byState"></div></div>
+<div class="card"><h2>実施時間による違い</h2><p class="hint">時間を入力した記録のみを集計します。異なる行動を混ぜた比較は参考値です。</p><div id="byDuration"></div></div>
+<div class="card">
+<h2>時間経過・反動</h2>
+<p>Ver.1では、直後の変化を記録します。</p>
+<p class="hint">数時間後・夜・翌朝のしんどさはまだ独立した入力項目がないため、自動集計には未対応です。メモに書き残すことはできます。</p>
+</div>
+<div class="card"><h2>記録から見える仮説</h2><div id="hypotheses"></div></div>
+<div class="card">
+<h2>分析上の注意</h2>
+<ul class="hint">
+<li>平均値だけでなく、記録件数や悪化した割合も確認してください。</li>
+<li>実施した記録だけでは「しんどいときに実行できなかった行動」は分かりません。</li>
+<li>行動の前後に変化があっても、別の出来事や体調が影響している可能性があります。</li>
+<li>少ない記録から効果を断定せず、仮説として扱います。</li>
+</ul>
+</div>
+</section>
+<p class="hint" style="text-align:center;margin-top:22px">しんどさ観察ログ Ver.1</p>
+</main>
+
+<script>
+(() => {
+'use strict';
+const KEY='distressLogV1';
+const DEFAULT_ACTIONS=['ジムに行く','散歩する','デイケアに行く','人と話す','カフェに行く','図書館に行く','読書する','勉強する','休息する','音楽を聴く'];
+const DEFAULT_STATES=['不安','悲しさ・抑うつ','罪悪感','怒り・いら立ち','孤独感','緊張・警戒','疲労','身体の重さ','安心感','達成感','楽しさ・喜び','意欲','自己効力感','他人への信頼感'];
+const $=id=>document.getElementById(id);
+let db=load(),selected=[],draft=[],editing=null;
+
+function load(){
+ try{
+  const x=JSON.parse(localStorage.getItem(KEY));
+  if(x&&Array.isArray(x.records))return {
+   records:x.records,
+   actions:Array.isArray(x.actions)?x.actions:DEFAULT_ACTIONS.slice(),
+   states:Array.isArray(x.states)?x.states:DEFAULT_STATES.slice()
+  };
+ }catch(e){}
+ return {records:[],actions:DEFAULT_ACTIONS.slice(),states:DEFAULT_STATES.slice()};
+}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function nowLocal(d=new Date()){
+ const p=n=>String(n).padStart(2,'0');
+ return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+function dateLabel(s){
+ const d=new Date(s);
+ return isNaN(d)?'日時不明':d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+function change(r){return Number(r.after)-Number(r.before);}
+function mean(a){return a.length?a.reduce((s,n)=>s+n,0)/a.length:null;}
+function avgLabel(n){return n===null?'—':`${n>0?'+':''}${n.toFixed(1)}点`;}
+function percent(a,b){return b?Math.round(a/b*100):0;}
+
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));
+ document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));
+ if(b.dataset.tab==='history')renderHistory();
+ if(b.dataset.tab==='analysis')renderAnalysis();
+});
+
+function renderActions(){
+ $('actions').innerHTML=db.actions.map(a=>`<button type="button" class="pill ${selected.includes(a)?'selected':''}" data-a="${esc(a)}">${esc(a)}</button>`).join('');
+ $('actions').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{
+  const a=b.dataset.a;
+  selected=selected.includes(a)?selected.filter(x=>x!==a):[...selected,a];
+  renderActions();
+ });
+}
+function addAction(){
+ const a=$('newAction').value.trim();if(!a)return;
+ if(!db.actions.includes(a))db.actions.push(a);
+ if(!selected.includes(a))selected.push(a);
+ $('newAction').value='';persist();renderActions();renderFilter();
+}
+$('addAction').onclick=addAction;
+$('newAction').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addAction();}};
+
+function renderChanges(){
+ $('changes').innerHTML=draft.map((c,i)=>`
+ <div class="change">
+  <input data-name="${i}" value="${esc(c.name)}" aria-label="状態名">
+  <div class="segment">
+   <button type="button" class="up ${c.direction==='増えた'?'on':''}" data-dir="増えた" data-i="${i}">増えた</button>
+   <button type="button" class="down ${c.direction==='減った'?'on':''}" data-dir="減った" data-i="${i}">減った</button>
+  </div>
+  <button type="button" class="btn small" data-remove="${i}">×</button>
+ </div>`).join('');
+ $('changes').querySelectorAll('[data-dir]').forEach(b=>b.onclick=()=>{
+  draft[+b.dataset.i].direction=b.dataset.dir;renderChanges();
+ });
+ $('changes').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{
+  draft.splice(+b.dataset.remove,1);renderChanges();
+ });
+ $('changes').querySelectorAll('[data-name]').forEach(b=>b.oninput=()=>{
+  draft[+b.dataset.name].name=b.value;
+ });
+}
+function addState(){
+ const s=$('newState').value.trim();if(!s)return;
+ if(!db.states.includes(s))db.states.push(s);
+ draft.push({name:s,direction:'増えた'});
+ $('newState').value='';persist();renderChanges();
+}
+$('addState').onclick=addState;
+$('newState').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addState();}};
+
+function updateScore(){
+ $('beforeValue').textContent=$('before').value;
+ $('afterValue').textContent=$('after').value;
+ const d=+$('after').value-(+$('before').value);
+ $('delta').textContent=(d>0?'+':'')+d+'点';
+ $('delta').className='delta '+(d<0?'good':d>0?'bad':'');
+ $('deltaText').textContent=d<0?'しんどさが減った':d>0?'しんどさが増えた':'変化なし';
+}
+$('before').oninput=updateScore;$('after').oninput=updateScore;
+
+function reset(){
+ editing=null;selected=[];draft=[];
+ $('form').reset();$('before').value=50;$('after').value=50;
+ $('date').value=nowLocal();$('editId').value='';
+ $('save').textContent='記録を保存';$('cancel').classList.add('hidden');
+ renderActions();renderChanges();updateScore();
+}
+$('cancel').onclick=reset;
+$('newRecord').onclick=()=>{
+ reset();document.querySelector('[data-tab="record"]').click();
+ window.scrollTo({top:0,behavior:'smooth'});
+};
+
+$('form').onsubmit=e=>{
+ e.preventDefault();
+ if(!selected.length){alert('行動を1つ以上選択してください。');return;}
+ const id=editing||(crypto.randomUUID?crypto.randomUUID():String(Date.now()));
+ const previous=db.records.find(r=>r.id===id);
+ const r={
+  id,actions:selected.slice(),
+  duration:$('duration').value===''?null:Math.max(0,Number($('duration').value)),
+  date:$('date').value||nowLocal(),
+  before:+$('before').value,after:+$('after').value,
+  changes:draft.map(c=>({name:c.name.trim(),direction:c.direction})).filter(c=>c.name),
+  memo:$('memo').value.trim(),
+  createdAt:previous?previous.createdAt:new Date().toISOString()
+ };
+ const i=db.records.findIndex(x=>x.id===id);
+ if(i<0)db.records.push(r);else db.records[i]=r;
+ persist();reset();renderHistory();renderAnalysis();
+ document.querySelector('[data-tab="history"]').click();
+ alert(i<0?'記録を保存しました。':'記録を更新しました。');
+};
+
+function renderFilter(){
+ const old=$('filter').value;
+ $('filter').innerHTML='<option value="">すべての行動</option>'+db.actions.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+ $('filter').value=db.actions.includes(old)?old:'';
+}
+$('filter').onchange=renderHistory;
+
+function renderHistory(){
+ renderFilter();
+ const f=$('filter').value;
+ const rs=db.records.filter(r=>!f||r.actions.includes(f)).slice().sort((a,b)=>b.date.localeCompare(a.date));
+ if(!rs.length){$('records').innerHTML='<div class="empty">まだ記録がありません。</div>';return;}
+ $('records').innerHTML=rs.map(r=>{
+  const d=change(r);
+  return `<article class="item">
+   <div class="itemtop"><div><b>${r.actions.map(esc).join('・')}</b><div class="hint">${esc(dateLabel(r.date))}${r.duration!==null?' · '+esc(r.duration)+'分':''}</div></div>
+   <b class="${d<0?'good':d>0?'bad':''}">${d>0?'+':''}${d}点</b></div>
+   <p>実施前 <b>${r.before}</b> → 実施後 <b>${r.after}</b></p>
+   <div>${(r.changes||[]).map(c=>`<span class="tag">${esc(c.name)}：${esc(c.direction)}</span>`).join('')}</div>
+   ${r.memo?`<p style="white-space:pre-wrap;margin-top:8px">${esc(r.memo)}</p>`:''}
+   <div class="toolbar" style="margin-top:10px">
+    <button class="btn small" data-edit="${esc(r.id)}">編集</button>
+    <button class="btn small danger" data-delete="${esc(r.id)}">削除</button>
+   </div>
+  </article>`;
+ }).join('');
+ $('records').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editRecord(b.dataset.edit));
+ $('records').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteRecord(b.dataset.delete));
+}
+function editRecord(id){
+ const r=db.records.find(x=>x.id===id);if(!r)return;
+ editing=id;selected=r.actions.slice();draft=(r.changes||[]).map(c=>({...c}));
+ $('before').value=r.before;$('after').value=r.after;
+ $('duration').value=r.duration??'';$('date').value=r.date;
+ $('memo').value=r.memo||'';$('save').textContent='変更を保存';
+ $('cancel').classList.remove('hidden');
+ renderActions();renderChanges();updateScore();
+ document.querySelector('[data-tab="record"]').click();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteRecord(id){
+ if(!confirm('この記録を削除しますか？'))return;
+ db.records=db.records.filter(r=>r.id!==id);persist();renderHistory();renderAnalysis();
+}
+
+function periodRecords(){
+ const p=$('period').value;
+ if(p==='all')return db.records.slice();
+ const cut=Date.now()-Number(p)*86400000;
+ return db.records.filter(r=>new Date(r.date).getTime()>=cut);
+}
+$('period').onchange=renderAnalysis;
+function groupsByAction(rs){
+ const m={};
+ rs.forEach(r=>r.actions.forEach(a=>(m[a]??=[]).push(r)));
+ return m;
+}
+function stats(rs){
+ const ds=rs.map(change);
+ return {n:ds.length,mean:mean(ds),relief:ds.filter(x=>x<0).length,
+  worse:ds.filter(x=>x>0).length,same:ds.filter(x=>x===0).length};
+}
+function metric(title,value,caption){
+ return `<div class="metric"><div class="caption">${esc(title)}</div><div class="value">${esc(value)}</div><div class="caption">${esc(caption||'')}</div></div>`;
+}
+function renderAnalysis(){
+ const rs=periodRecords(),s=stats(rs);
+ $('overview').innerHTML=
+  metric('記録数',s.n+'件','選択期間')+
+  metric('平均変化量',avgLabel(s.mean),'マイナス＝軽減')+
+  metric('軽減した割合',percent(s.relief,s.n)+'%',s.relief+'件')+
+  metric('悪化した割合',percent(s.worse,s.n)+'%',s.worse+'件');
+ renderActionAnalysis(rs);renderSeverity(rs);renderStates(rs);renderDurations(rs);renderHypotheses(rs);
+}
+function renderActionAnalysis(rs){
+ const list=Object.entries(groupsByAction(rs)).map(([name,rs])=>({name,...stats(rs)})).sort((a,b)=>(a.mean??0)-(b.mean??0));
+ if(!list.length){$('byAction').innerHTML='<div class="empty">記録が集まると行動別に分析します。</div>';return;}
+ $('byAction').innerHTML=list.map(x=>`
+ <div class="item">
+  <div class="itemtop"><b>${esc(x.name)}</b><b>${avgLabel(x.mean)}</b></div>
+  <div class="bar"><span class="${x.mean>0?'negative':''}" style="width:${Math.min(100,Math.abs(x.mean||0))}%"></span></div>
+  <div class="hint">${x.n}回 · 軽減 ${percent(x.relief,x.n)}% · 悪化 ${percent(x.worse,x.n)}% · 変化なし ${percent(x.same,x.n)}%</div>
+ </div>`).join('');
+}
+function band(n){return n<=33?'低（0〜33）':n<=66?'中（34〜66）':'高（67〜100）';}
+function renderSeverity(rs){
+ const names=['低（0〜33）','中（34〜66）','高（67〜100）'];
+ const overall=names.map(n=>{
+  const a=rs.filter(r=>band(r.before)===n),s=stats(a);
+  return `<div class="item"><b>${n}</b><p>平均変化量：<b>${avgLabel(s.mean)}</b></p><div class="hint">${s.n}件 · 軽減 ${percent(s.relief,s.n)}% · 悪化 ${percent(s.worse,s.n)}%</div></div>`;
+ }).join('');
+ const perAction=[];
+ Object.entries(groupsByAction(rs)).forEach(([name,a])=>names.forEach(n=>{
+  const subset=a.filter(r=>band(r.before)===n);
+  if(subset.length>=2)perAction.push({name,n,stats:stats(subset)});
+ }));
+ $('bySeverity').innerHTML=overall+
+  '<h3>行動 × しんどさの程度</h3>'+
+  (perAction.length?perAction.map(x=>`<p>${esc(x.name)}・${x.n}：<b>${avgLabel(x.stats.mean)}</b>（${x.stats.n}件）</p>`).join(''):'<p class="hint">同じ行動・同じ区分の記録が2件以上になると比較を表示します。</p>');
+}
+function renderStates(rs){
+ const map={};
+ rs.forEach(r=>(r.changes||[]).forEach(c=>{
+  if(!c.name)return;
+  map[c.name]??={up:0,down:0};
+  if(c.direction==='増えた')map[c.name].up++;else map[c.name].down++;
+ }));
+ const entries=Object.entries(map).sort((a,b)=>(b[1].up+b[1].down)-(a[1].up+a[1].down));
+ $('byState').innerHTML=entries.length?entries.map(([name,v])=>`
+ <div class="item"><div class="itemtop"><b>${esc(name)}</b><span>${v.up+v.down}回</span></div>
+ <div class="hint">増えた ${v.up}回 · 減った ${v.down}回</div></div>`).join(''):
+ '<div class="empty">状態の変化を記録すると、ここに集計されます。</div>';
+}
+function renderDurations(rs){
+ const timed=rs.filter(r=>r.duration!==null&&Number.isFinite(Number(r.duration)));
+ if(timed.length<2){$('byDuration').innerHTML='<div class="empty">実施時間の記録が2件以上集まると表示します。時間の入力は任意です。</div>';return;}
+ const bins=[
+  {name:'短め（15分以下）',test:n=>n<=15},
+  {name:'中くらい（16〜60分）',test:n=>n>15&&n<=60},
+  {name:'長め（60分超）',test:n=>n>60}
+ ];
+ $('byDuration').innerHTML=bins.map(b=>{
+  const a=timed.filter(r=>b.test(Number(r.duration))),s=stats(a);
+  return `<div class="item"><b>${b.name}</b><p>平均変化量：<b>${avgLabel(s.mean)}</b></p><div class="hint">${s.n}件</div></div>`;
+ }).join('');
+}
+function renderHypotheses(rs){
+ const out=[];
+ Object.entries(groupsByAction(rs)).forEach(([name,a])=>{
+  const s=stats(a);
+  if(a.length>=3&&s.mean<=-5&&s.relief/a.length>=.6)
+   out.push(`「${name}」は、記録上しんどさが軽減する傾向（${a.length}件、平均${avgLabel(s.mean)}）。`);
+  if(a.length>=3&&s.mean>=5&&s.worse/a.length>=.6)
+   out.push(`「${name}」は、記録上しんどさが増える傾向（${a.length}件、平均${avgLabel(s.mean)}）。`);
+  ['低（0〜33）','中（34〜66）','高（67〜100）'].forEach(n=>{
+   const subset=a.filter(r=>band(r.before)===n);
+   const x=stats(subset);
+   if(subset.length>=3&&x.mean<=-5)
+    out.push(`しんどさが${n}のとき、「${name}」の後に軽減する傾向（${subset.length}件、平均${avgLabel(x.mean)}）。`);
+  });
+ });
+ const states={};
+ rs.forEach(r=>(r.changes||[]).forEach(c=>{
+  states[c.name]??={up:0,down:0};
+  states[c.name][c.direction==='増えた'?'up':'down']++;
+ }));
+ Object.entries(states).forEach(([name,v])=>{
+  const n=v.up+v.down;
+  if(n>=3&&v.up/n>=.7)out.push(`「${name}」は増えたと記録されることが多い（${v.up}/${n}回）。`);
+  if(n>=3&&v.down/n>=.7)out.push(`「${name}」は減ったと記録されることが多い（${v.down}/${n}回）。`);
+ });
+ $('hypotheses').innerHTML=out.length?
+ '<ul>'+out.map(x=>`<li style="margin:8px 0">${esc(x)}</li>`).join('')+'</ul><p class="hint">仮説は観察された傾向であり、原因や確実な効果を証明するものではありません。</p>':
+ '<div class="empty">各行動・状態の記録が3件以上になると、仮説を表示します。まずは記録を集めましょう。</div>';
+}
+
+$('export').onclick=()=>{
+ const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='shindosa-log-backup.json';a.click();URL.revokeObjectURL(url);
+};
+$('import').onclick=()=>$('file').click();
+$('file').onchange=async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{
+  const x=JSON.parse(await f.text());
+  if(!x||!Array.isArray(x.records)||!Array.isArray(x.actions)||!Array.isArray(x.states))throw Error();
+  if(!confirm('現在のデータを読み込んだデータで置き換えますか？'))return;
+  db=x;persist();renderActions();renderHistory();renderAnalysis();alert('復元しました。');
+ }catch(err){alert('有効なバックアップJSONではありません。');}
+ e.target.value='';
+};
+$('clear').onclick=()=>{
+ if(!confirm('全記録を削除しますか？この操作は取り消せません。'))return;
+ db.records=[];persist();renderHistory();renderAnalysis();
+};
+
+$('date').value=nowLocal();
+renderActions();renderChanges();updateScore();renderFilter();renderHistory();renderAnalysis();
+})();
+</script>
+</body>
+</html>
