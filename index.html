@@ -5,106 +5,114 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f5f4ef">
-<title>しんどさ観察ログ</title>
+<title>しんどさ観察ログ Ver.2</title>
 <style>
-:root {
-  --bg:#f5f4ef; --card:#fff; --ink:#292d29;
-  --muted:#747970; --line:#e3e4dc;
-  --green:#526b58; --soft:#e8eee8;
-  --red:#a34e47; --good:#41724e;
+:root{
+ --bg:#f5f4ef;--card:#fff;--ink:#292d29;--muted:#747970;
+ --line:#e3e4dc;--green:#526b58;--soft:#e8eee8;
+ --red:#a34e47;--good:#41724e;
 }
-* {box-sizing:border-box}
-body {
-  margin:0;background:var(--bg);color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",
-  "Noto Sans JP",sans-serif;line-height:1.6;
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+ font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.6}
+header,main{max-width:900px;margin:auto}
+header{padding:22px 16px 12px}
+h1{font-size:1.45rem;margin:0}h2{font-size:1.12rem;margin:0 0 12px}h3{font-size:1rem}
+p{margin:6px 0}small,.muted{color:var(--muted)}
+main{padding:0 12px 50px}
+nav{display:flex;gap:4px;background:#e8e7e0;padding:5px;border-radius:13px;
+ position:sticky;top:0;z-index:10;margin-bottom:14px;overflow-x:auto}
+nav button{flex:1;min-width:65px;border:0;background:transparent;padding:10px 5px;
+ border-radius:9px;font-weight:bold;color:#62665f;font-size:.85rem}
+nav button.active{background:white;color:var(--ink)}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:12px}
+label{display:block;font-weight:650;margin-bottom:6px;font-size:.93rem}
+.field{margin-bottom:17px}
+input,textarea,select{width:100%;padding:11px;border:1px solid #d7d9d1;
+ border-radius:10px;background:white;color:var(--ink);font:inherit}
+input[type=range]{padding:0;accent-color:var(--green)}
+textarea{min-height:75px;resize:vertical}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid #d5d8cf;border-radius:10px;background:white;padding:10px 13px;color:var(--ink);font-weight:650}
+.btn.primary{background:var(--green);color:white;border-color:var(--green)}
+.btn.danger{color:var(--red)}.btn.small{font-size:.82rem;padding:6px 9px}
+.row{display:flex;align-items:center;gap:8px}.row .grow{flex:1;min-width:0}
+.pills{display:flex;flex-wrap:wrap;gap:7px}
+.pill{border:1px solid #d5d8cf;background:white;border-radius:20px;padding:8px 12px;font-size:.9rem}
+.pill.selected{background:var(--soft);border-color:#91a895}
+.scoreline{display:flex;align-items:center;gap:12px}
+.scoreline input{flex:1;min-width:0}
+.score{font-size:1.35rem;font-weight:bold;min-width:42px;text-align:right}
+.scale{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem}
+.notice{padding:12px;background:#f0f1eb;border-radius:11px}
+.delta{font-size:1.55rem;font-weight:800}
+.good{color:var(--good)}.bad{color:var(--red)}
+.change{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;margin:9px 0}
+.change input{padding:8px}
+.segment{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.segment button{border:0;background:white;padding:8px;font-size:.82rem}
+.segment button.on{background:var(--soft);font-weight:bold}
+.segment button.up.on{background:#f7e8e5;color:var(--red)}
+.segment button.down.on{background:#e7f1e8;color:var(--good)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap}.toolbar>*{flex:1}
+.item{border:1px solid var(--line);border-radius:13px;padding:13px;margin:9px 0;background:white}
+.itemtop{display:flex;justify-content:space-between;gap:8px}
+.tag{display:inline-block;background:#efefe9;border-radius:15px;padding:3px 8px;font-size:.78rem;margin:3px 3px 0 0}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.metric{background:white;border:1px solid var(--line);border-radius:13px;padding:12px;min-width:0}
+.metric .value{font-size:1.3rem;font-weight:800;overflow-wrap:anywhere}
+.metric .caption{font-size:.8rem;color:var(--muted)}
+.bar{height:8px;background:#eeeee8;border-radius:9px;overflow:hidden;margin:6px 0}
+.bar span{display:block;height:100%;background:var(--green)}
+.bar span.negative{background:var(--red)}
+.empty{text-align:center;color:var(--muted);padding:20px 8px}
+.hint{font-size:.82rem;color:var(--muted)}
+.hidden{display:none!important}
+.divider{border:0;border-top:1px solid var(--line);margin:16px 0}
+
+/* 重点行動：とにかく目立つ */
+.focus-banner{
+ position:relative;overflow:hidden;border-radius:23px;padding:22px 17px;margin:0 0 15px;
+ color:white;background:linear-gradient(135deg,#ff3cac 0%,#784bff 48%,#2b8cff 100%);
+ box-shadow:0 8px 0 #d4c5f3,0 12px 25px #7c52a044;
+ border:3px solid white;
 }
-header,main {max-width:850px;margin:auto}
-header {padding:24px 16px 12px}
-h1 {font-size:1.45rem;margin:0}
-h2 {font-size:1.12rem;margin:0 0 12px}
-h3 {font-size:1rem}
-p {margin:6px 0}
-small,.muted {color:var(--muted)}
-main {padding:0 12px 50px}
-nav {display:flex;gap:5px;background:#e8e7e0;padding:5px;
-  border-radius:13px;position:sticky;top:0;z-index:5;margin-bottom:14px}
-nav button {flex:1;border:0;background:transparent;padding:11px 3px;
-  border-radius:9px;font-weight:bold;color:#62665f}
-nav button.active {background:white;color:var(--ink)}
-.panel {display:none}
-.panel.active {display:block}
-.card {background:var(--card);border:1px solid var(--line);
-  border-radius:17px;padding:16px;margin-bottom:12px}
-label {display:block;font-weight:650;margin-bottom:6px;font-size:.93rem}
-.field {margin-bottom:18px}
-input,textarea,select {
-  width:100%;padding:11px;border:1px solid #d7d9d1;
-  border-radius:10px;background:white;color:var(--ink);font:inherit;
-}
-input[type=range] {padding:0;accent-color:var(--green)}
-textarea {min-height:85px;resize:vertical}
-button {font:inherit;cursor:pointer}
-.btn {border:1px solid #d5d8cf;border-radius:10px;background:white;
-  padding:10px 13px;color:var(--ink);font-weight:650}
-.btn.primary {background:var(--green);color:white;border-color:var(--green)}
-.btn.danger {color:var(--red)}
-.btn.small {font-size:.83rem;padding:6px 9px}
-.row {display:flex;align-items:center;gap:8px}
-.row .grow {flex:1;min-width:0}
-.pills {display:flex;flex-wrap:wrap;gap:7px}
-.pill {border:1px solid #d5d8cf;background:white;border-radius:20px;
-  padding:8px 12px;font-size:.9rem}
-.pill.selected {background:var(--soft);border-color:#91a895}
-.scoreline {display:flex;align-items:center;gap:12px}
-.scoreline input {flex:1;min-width:0}
-.score {font-size:1.35rem;font-weight:bold;min-width:42px;text-align:right}
-.scale {display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem}
-.notice {padding:12px;background:#f0f1eb;border-radius:11px}
-.delta {font-size:1.55rem;font-weight:800}
-.good {color:var(--good)} .bad {color:var(--red)}
-.change {display:grid;grid-template-columns:minmax(0,1fr) auto auto;
-  gap:6px;align-items:center;margin:9px 0}
-.change input {padding:8px}
-.segment {display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
-.segment button {border:0;background:white;padding:8px;font-size:.82rem}
-.segment button.on {background:var(--soft);font-weight:bold}
-.segment button.up.on {background:#f7e8e5;color:var(--red)}
-.segment button.down.on {background:#e7f1e8;color:var(--good)}
-.toolbar {display:flex;gap:8px;flex-wrap:wrap}
-.toolbar>* {flex:1}
-.item {border:1px solid var(--line);border-radius:13px;padding:13px;margin:9px 0;background:white}
-.itemtop {display:flex;justify-content:space-between;gap:8px}
-.tag {display:inline-block;background:#efefe9;border-radius:15px;
-  padding:3px 8px;font-size:.78rem;margin:3px 3px 0 0}
-.metrics {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.metric {background:white;border:1px solid var(--line);border-radius:13px;padding:12px}
-.metric .value {font-size:1.35rem;font-weight:800}
-.metric .caption {font-size:.8rem;color:var(--muted)}
-.bar {height:8px;background:#eeeee8;border-radius:9px;overflow:hidden;margin:6px 0}
-.bar span {display:block;height:100%;background:var(--green)}
-.bar span.negative {background:var(--red)}
-.empty {text-align:center;color:var(--muted);padding:20px 8px}
-.hint {font-size:.82rem;color:var(--muted)}
-.hidden {display:none!important}
-@media(min-width:600px) {
-  .metrics {grid-template-columns:repeat(4,minmax(0,1fr))}
-}
+.focus-banner:before{content:"★";position:absolute;right:9px;top:-32px;font-size:110px;color:#ffffff22;transform:rotate(15deg)}
+.focus-banner:after{content:"今週のミッション";position:absolute;right:12px;top:12px;
+ font-size:.7rem;font-weight:900;background:#fff;color:#7745d8;padding:5px 9px;border-radius:20px}
+.focus-kicker{font-size:.78rem;letter-spacing:.12em;font-weight:900;opacity:.95}
+.focus-title{font-size:clamp(1.55rem,6vw,2.45rem);font-weight:1000;line-height:1.22;margin:12px 0;overflow-wrap:anywhere}
+.focus-purpose{font-size:.95rem;background:#ffffff20;border:1px solid #ffffff55;border-radius:13px;padding:11px;margin:12px 0}
+.focus-count{font-size:1.1rem;font-weight:900;margin-top:13px}
+.focus-track{height:14px;border-radius:20px;background:#ffffff55;overflow:hidden;margin-top:8px}
+.focus-track span{height:100%;display:block;background:#fff4a6;border-radius:20px;transition:width .25s}
+.focus-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.focus-actions button{border:2px solid #ffffffaa;background:#ffffff22;color:white;border-radius:10px;padding:8px 11px;font-weight:bold}
+.focus-empty{background:linear-gradient(135deg,#292d29,#53594d);box-shadow:none}
+.focus-empty .focus-title{font-size:1.55rem}
+.focus-editor{border:2px dashed #c7b4fa;background:#fcf9ff}
+.focus-mini{background:#f2eaff;border:1px solid #d6c4ff;border-radius:12px;padding:12px;margin-bottom:12px}
+.status{font-size:.82rem;font-weight:bold}
+@media(min-width:600px){.metrics{grid-template-columns:repeat(4,minmax(0,1fr))}.focus-banner{padding:27px}}
 </style>
 </head>
 <body>
 <header>
-  <h1>しんどさ観察ログ</h1>
-  <p class="muted">記録して、傾向を見つけて、自分の取扱説明書を作る。</p>
+ <h1>しんどさ観察ログ</h1>
+ <p class="muted">記録して、傾向を見つけて、自分の取扱説明書を作る。</p>
 </header>
 <main>
 <nav>
-  <button class="active" data-tab="record">記録</button>
-  <button data-tab="history">履歴</button>
-  <button data-tab="analysis">分析</button>
+ <button class="active" data-tab="record">記録</button>
+ <button data-tab="history">履歴</button>
+ <button data-tab="analysis">分析</button>
+ <button data-tab="focus">🎯重点行動</button>
 </nav>
 
+<!-- 記録 -->
 <section id="record" class="panel active">
+<div id="focusBanner"></div>
 <form id="form">
 <input type="hidden" id="editId">
 
@@ -114,16 +122,16 @@ button {font:inherit;cursor:pointer}
 <label>行動（複数選択可）</label>
 <div id="actions" class="pills"></div>
 <div class="row" style="margin-top:10px">
-  <div class="grow"><input id="newAction" placeholder="行動を追加"></div>
-  <button class="btn" type="button" id="addAction">追加</button>
+<div class="grow"><input id="newAction" placeholder="行動を追加"></div>
+<button class="btn" type="button" id="addAction">追加</button>
 </div>
-<p class="hint">自分で追加した行動は、次回以降も選択できます。</p>
+<p class="hint">自分で追加した行動は次回以降も選べます。</p>
 </div>
 <div class="field">
 <label for="duration">実施時間（任意・分）</label>
 <input id="duration" type="number" min="0" placeholder="例：30">
 </div>
-<div class="field" style="margin-bottom:0">
+<div class="field">
 <label for="date">実施日時</label>
 <input id="date" type="datetime-local">
 </div>
@@ -134,42 +142,81 @@ button {font:inherit;cursor:pointer}
 <p class="hint">0＝まったくしんどくない、100＝想像できる最大限のしんどさ</p>
 <div class="field">
 <label for="before">実施前</label>
-<div class="scoreline">
-<input id="before" type="range" min="0" max="100" value="50">
-<output id="beforeValue" class="score">50</output>
-</div>
+<div class="scoreline"><input id="before" type="range" min="0" max="100" value="50"><output id="beforeValue" class="score">50</output></div>
 <div class="scale"><span>0</span><span>50</span><span>100</span></div>
 </div>
 <div class="field">
-<label for="after">実施後</label>
-<div class="scoreline">
-<input id="after" type="range" min="0" max="100" value="50">
-<output id="afterValue" class="score">50</output>
-</div>
+<label for="after">実施直後</label>
+<div class="scoreline"><input id="after" type="range" min="0" max="100" value="50"><output id="afterValue" class="score">50</output></div>
 <div class="scale"><span>0</span><span>50</span><span>100</span></div>
 </div>
-<div class="notice">
-  変化量（実施後 − 実施前）
-  <div id="delta" class="delta">0点</div>
-  <span id="deltaText">変化なし</span>
-</div>
+<div class="notice">変化量（実施後 − 実施前）
+<div id="delta" class="delta">0点</div><span id="deltaText">変化なし</span></div>
 </div>
 
 <div class="card">
 <h2>3. その他の変化</h2>
-<p class="hint">不安・達成感・疲労など、感じた変化を複数記録できます。</p>
+<p class="hint">不安・達成感・疲労など。以前登録した項目を選択できます。</p>
 <div id="changes"></div>
-<div class="row" style="margin-top:10px">
-  <div class="grow"><input id="newState" placeholder="状態を追加（例：安心感）"></div>
-  <button class="btn" type="button" id="addState">追加</button>
+<div class="field" style="margin-top:12px">
+<label>登録済みの状態を追加</label>
+<div id="stateChoices" class="pills"></div>
+</div>
+<div class="row">
+<div class="grow"><input id="newState" placeholder="新しい状態（例：安心感）"></div>
+<button class="btn" type="button" id="addState">追加</button>
 </div>
 </div>
 
 <div class="card">
-<h2>4. その他メモ</h2>
-<textarea id="memo" placeholder="気づいたこと、出来事、理由など"></textarea>
+<h2>4. 条件・背景</h2>
+<p class="hint">任意項目。条件別に比較するために使います。わからなければ空欄でOK。</p>
+<div class="field">
+<label for="sleepCondition">直近の睡眠・休息</label>
+<select id="sleepCondition">
+<option value="">未記録</option><option value="よく休めた">よく休めた</option>
+<option value="ふつう">ふつう</option><option value="あまり休めなかった">あまり休めなかった</option>
+<option value="かなり寝不足・疲労">かなり寝不足・疲労</option>
+</select>
+</div>
+<div class="field">
+<label for="company">過ごし方</label>
+<select id="company">
+<option value="">未記録</option><option value="一人">一人</option>
+<option value="知っている人と">知っている人と</option><option value="知らない人・人混み">知らない人・人混み</option>
+</select>
+</div>
+<div class="field" style="margin-bottom:0">
+<label for="context">その他の条件（任意）</label>
+<input id="context" placeholder="例：雨、体調不良、予定の後など">
+</div>
 </div>
 
+<div class="card">
+<h2>5. 時間が経ってからの変化</h2>
+<p class="hint">直後にはわからない影響を記録。測れたときだけ入力すればOK。未入力はゼロ扱いしません。</p>
+<div class="field">
+<label for="later1">1〜3時間後のしんどさ</label>
+<div class="scoreline"><input id="later1" type="range" min="0" max="100" value="50"><output id="later1Value" class="score">—</output></div>
+<button type="button" class="btn small" data-clear-score="later1">未記録にする</button>
+</div>
+<div class="field">
+<label for="bedtime">就寝前のしんどさ</label>
+<div class="scoreline"><input id="bedtime" type="range" min="0" max="100" value="50"><output id="bedtimeValue" class="score">—</output></div>
+<button type="button" class="btn small" data-clear-score="bedtime">未記録にする</button>
+</div>
+<div class="field">
+<label for="nextMorning">翌朝のしんどさ</label>
+<div class="scoreline"><input id="nextMorning" type="range" min="0" max="100" value="50"><output id="nextMorningValue" class="score">—</output></div>
+<button type="button" class="btn small" data-clear-score="nextMorning">未記録にする</button>
+</div>
+<p class="hint">スライダーを動かすと記録対象になります。「未記録にする」で解除できます。</p>
+</div>
+
+<div class="card">
+<h2>6. メモ</h2>
+<textarea id="memo" placeholder="気づいたこと、出来事、理由など"></textarea>
+</div>
 <div class="toolbar">
 <button type="button" class="btn hidden" id="cancel">編集をキャンセル</button>
 <button type="submit" class="btn primary" id="save">記録を保存</button>
@@ -177,120 +224,196 @@ button {font:inherit;cursor:pointer}
 </form>
 </section>
 
+<!-- 履歴 -->
 <section id="history" class="panel">
 <div class="card">
 <h2>記録履歴</h2>
 <div class="row">
-  <div class="grow"><select id="filter"><option value="">すべての行動</option></select></div>
-  <button class="btn small" id="newRecord">新規記録</button>
+<div class="grow"><select id="filter"><option value="">すべての行動</option></select></div>
+<button class="btn small" id="newRecord">新規記録</button>
 </div>
 <div id="records"></div>
-<hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+<hr class="divider">
 <div class="toolbar">
 <button class="btn" id="export">JSONバックアップ</button>
 <button class="btn" id="import">JSON復元</button>
 <input id="file" type="file" accept=".json,application/json" class="hidden">
 </div>
 <button class="btn danger" id="clear" style="width:100%;margin-top:9px">全記録を削除</button>
-<p class="hint">記録はこのブラウザ内に保存されます。端末変更やブラウザのデータ消去に備え、定期的にバックアップしてください。</p>
+<p class="hint">記録はこのブラウザ内に保存されます。定期的にバックアップしてください。</p>
 </div>
 </section>
 
+<!-- 分析 -->
 <section id="analysis" class="panel">
 <div class="card">
 <h2>分析ダッシュボード</h2>
-<p class="hint">点数差は「実施後 − 実施前」。マイナスほど、直後にしんどさが軽減しています。</p>
+<p class="hint">変化量＝実施後 − 実施前。マイナスほどしんどさが軽減しています。</p>
 <label for="period">集計期間</label>
-<select id="period">
-<option value="all">全期間</option>
-<option value="7">直近7日</option>
-<option value="30">直近30日</option>
-<option value="90">直近90日</option>
-</select>
+<select id="period"><option value="all">全期間</option><option value="7">直近7日</option><option value="30">直近30日</option><option value="90">直近90日</option></select>
 <div id="overview" class="metrics" style="margin-top:12px"></div>
 </div>
-<div class="card"><h2>行動別の効果</h2><div id="byAction"></div></div>
-<div class="card"><h2>しんどさの程度別</h2><div id="bySeverity"></div></div>
-<div class="card"><h2>感情・状態別</h2><div id="byState"></div></div>
-<div class="card"><h2>実施時間による違い</h2><p class="hint">時間を入力した記録のみを集計します。異なる行動を混ぜた比較は参考値です。</p><div id="byDuration"></div></div>
 <div class="card">
-<h2>時間経過・反動</h2>
-<p>Ver.1では、直後の変化を記録します。</p>
-<p class="hint">数時間後・夜・翌朝のしんどさはまだ独立した入力項目がないため、自動集計には未対応です。メモに書き残すことはできます。</p>
+<h2>行動別の効果</h2>
+<label for="actionAnalysisFilter">分析する行動</label>
+<select id="actionAnalysisFilter"><option value="">すべての行動</option></select>
+<div id="byAction"></div>
 </div>
+<div class="card"><h2>しんどさの程度別</h2><div id="bySeverity"></div></div>
+<div class="card"><h2>条件別の比較</h2><p class="hint">睡眠状況・過ごし方・時間帯ごとの比較。行動を絞ると、より比較しやすくなります。</p><div id="byConditions"></div></div>
+<div class="card"><h2>時間経過・反動</h2><p class="hint">直後と、1〜3時間後・就寝前・翌朝を比較します。記録がある項目だけを集計します。</p><div id="byTime"></div></div>
+<div class="card"><h2>感情・状態別</h2><div id="byState"></div></div>
+<div class="card"><h2>実施時間による違い</h2><div id="byDuration"></div></div>
 <div class="card"><h2>記録から見える仮説</h2><div id="hypotheses"></div></div>
 <div class="card">
 <h2>分析上の注意</h2>
 <ul class="hint">
 <li>平均値だけでなく、記録件数や悪化した割合も確認してください。</li>
-<li>実施した記録だけでは「しんどいときに実行できなかった行動」は分かりません。</li>
-<li>行動の前後に変化があっても、別の出来事や体調が影響している可能性があります。</li>
-<li>少ない記録から効果を断定せず、仮説として扱います。</li>
+<li>条件別比較は、同じ行動を条件ごとに分けて見ることができます。</li>
+<li>時間差の数値は、行動以外の出来事や体調にも左右されます。</li>
+<li>記録が少ないときは結論ではなく仮説として扱います。</li>
 </ul>
 </div>
 </section>
-<p class="hint" style="text-align:center;margin-top:22px">しんどさ観察ログ Ver.1</p>
+
+<!-- 重点行動 -->
+<section id="focus" class="panel">
+<div id="focusManageBanner"></div>
+<div class="card focus-editor">
+<h2>🔥 今週の重点行動を設定</h2>
+<p class="hint">「今週はこれを重点的にやって、データを集めよう！」というテーマを入力。設定は週ごとに保存されます。</p>
+<div class="field">
+<label for="focusAction">重点的に観察する行動</label>
+<input id="focusAction" list="actionOptions" placeholder="例：カフェに行く">
+<datalist id="actionOptions"></datalist>
+</div>
+<div class="field">
+<label for="focusTitle">目立つ見出し</label>
+<input id="focusTitle" placeholder="例：今週はカフェの回復効果を検証する！！">
+</div>
+<div class="field">
+<label for="focusPurpose">何を確かめたい？</label>
+<textarea id="focusPurpose" placeholder="例：行く前と帰宅後で、しんどさがどのくらい変わるか"></textarea>
+</div>
+<div class="field">
+<label for="focusTarget">目標記録回数</label>
+<input id="focusTarget" type="number" min="1" max="100" value="3">
+</div>
+<div class="field">
+<label for="focusReflection">今週の振り返り（週の途中でも編集可）</label>
+<textarea id="focusReflection" placeholder="気づいたこと、次に試したいことなど"></textarea>
+</div>
+<div class="toolbar">
+<button class="btn primary" id="saveFocus" type="button">今週の重点行動を保存！</button>
+<button class="btn" id="clearFocus" type="button">今週の設定を解除</button>
+</div>
+<p class="hint">設定を解除しても過去の週の履歴は削除されません。見出し・目的・目標回数もその週の記録として保存されます。</p>
+</div>
+<div class="card">
+<h2>📚 過去の重点行動</h2>
+<p class="hint">週ごとの重点テーマ・実際の記録件数・振り返りを確認できます。</p>
+<div id="focusHistory"></div>
+</div>
+</section>
+
+<p class="hint" style="text-align:center;margin-top:22px">しんどさ観察ログ Ver.2</p>
 </main>
 
 <script>
-(() => {
+(()=>{
 'use strict';
 const KEY='distressLogV1';
 const DEFAULT_ACTIONS=['ジムに行く','散歩する','デイケアに行く','人と話す','カフェに行く','図書館に行く','読書する','勉強する','休息する','音楽を聴く'];
 const DEFAULT_STATES=['不安','悲しさ・抑うつ','罪悪感','怒り・いら立ち','孤独感','緊張・警戒','疲労','身体の重さ','安心感','達成感','楽しさ・喜び','意欲','自己効力感','他人への信頼感'];
 const $=id=>document.getElementById(id);
-let db=load(),selected=[],draft=[],editing=null;
+const uid=()=>crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random();
+let db=load(),selected=[],draft=[],editing=null,optionalScores={later1:null,bedtime:null,nextMorning:null};
 
 function load(){
  try{
   const x=JSON.parse(localStorage.getItem(KEY));
   if(x&&Array.isArray(x.records))return {
-   records:x.records,
+   ...x,records:x.records,
    actions:Array.isArray(x.actions)?x.actions:DEFAULT_ACTIONS.slice(),
-   states:Array.isArray(x.states)?x.states:DEFAULT_STATES.slice()
+   states:Array.isArray(x.states)?x.states:DEFAULT_STATES.slice(),
+   focusWeeks:x.focusWeeks&&typeof x.focusWeeks==='object'?x.focusWeeks:{}
   };
  }catch(e){}
- return {records:[],actions:DEFAULT_ACTIONS.slice(),states:DEFAULT_STATES.slice()};
+ return {records:[],actions:DEFAULT_ACTIONS.slice(),states:DEFAULT_STATES.slice(),focusWeeks:{}};
 }
-function persist(){localStorage.setItem(KEY,JSON.stringify(db));}
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function nowLocal(d=new Date()){
  const p=n=>String(n).padStart(2,'0');
  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 function dateLabel(s){
- const d=new Date(s);
- return isNaN(d)?'日時不明':d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+ const d=new Date(s);return isNaN(d)?'日時不明':d.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
 }
-function change(r){return Number(r.after)-Number(r.before);}
-function mean(a){return a.length?a.reduce((s,n)=>s+n,0)/a.length:null;}
-function avgLabel(n){return n===null?'—':`${n>0?'+':''}${n.toFixed(1)}点`;}
-function percent(a,b){return b?Math.round(a/b*100):0;}
+function change(r){return Number(r.after)-Number(r.before)}
+function mean(a){return a.length?a.reduce((s,n)=>s+n,0)/a.length:null}
+function avgLabel(n){return n===null?'—':`${n>0?'+':''}${n.toFixed(1)}点`}
+function percent(a,b){return b?Math.round(a/b*100):0}
+function stats(rs){
+ const ds=rs.map(change);
+ return {n:ds.length,mean:mean(ds),relief:ds.filter(x=>x<0).length,worse:ds.filter(x=>x>0).length,same:ds.filter(x=>x===0).length};
+}
+function metric(title,value,caption){
+ return `<div class="metric"><div class="caption">${esc(title)}</div><div class="value">${esc(value)}</div><div class="caption">${esc(caption||'')}</div></div>`;
+}
+function weekStart(d=new Date()){
+ const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+ const day=(x.getDay()+6)%7;x.setDate(x.getDate()-day);
+ return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+}
+function weekEnd(key){
+ const d=new Date(key+'T12:00:00');d.setDate(d.getDate()+6);
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function weekLabel(key){return `${key.replaceAll('-','/')} 〜 ${weekEnd(key).replaceAll('-','/')}`}
+function inWeek(r,key){
+ const date=String(r.date||'').slice(0,10);
+ return date>=key&&date<=weekEnd(key);
+}
+function currentFocus(){return db.focusWeeks[weekStart()]||null}
+function focusRecords(f,key){
+ if(!f||!f.action)return [];
+ return db.records.filter(r=>inWeek(r,key)&&r.actions.includes(f.action));
+}
 
+/* Tabs */
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));
  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));
  if(b.dataset.tab==='history')renderHistory();
  if(b.dataset.tab==='analysis')renderAnalysis();
+ if(b.dataset.tab==='focus')renderFocusPage();
+ if(b.dataset.tab==='record')renderFocusBanner();
 });
+function goTab(name){
+ document.querySelector(`[data-tab="${name}"]`).click();
+ window.scrollTo({top:0,behavior:'smooth'});
+}
 
+/* 行動選択 */
 function renderActions(){
  $('actions').innerHTML=db.actions.map(a=>`<button type="button" class="pill ${selected.includes(a)?'selected':''}" data-a="${esc(a)}">${esc(a)}</button>`).join('');
  $('actions').querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{
-  const a=b.dataset.a;
-  selected=selected.includes(a)?selected.filter(x=>x!==a):[...selected,a];
+  const a=b.dataset.a;selected=selected.includes(a)?selected.filter(x=>x!==a):[...selected,a];
   renderActions();
  });
+ $('actionOptions').innerHTML=db.actions.map(a=>`<option value="${esc(a)}"></option>`).join('');
 }
 function addAction(){
  const a=$('newAction').value.trim();if(!a)return;
  if(!db.actions.includes(a))db.actions.push(a);
  if(!selected.includes(a))selected.push(a);
- $('newAction').value='';persist();renderActions();renderFilter();
+ $('newAction').value='';persist();renderActions();renderFilter();renderAnalysisFilters();
 }
 $('addAction').onclick=addAction;
-$('newAction').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addAction();}};
+$('newAction').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addAction()}};
 
+/* 感情・状態 */
 function renderChanges(){
  $('changes').innerHTML=draft.map((c,i)=>`
  <div class="change">
@@ -305,21 +428,32 @@ function renderChanges(){
   draft[+b.dataset.i].direction=b.dataset.dir;renderChanges();
  });
  $('changes').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{
-  draft.splice(+b.dataset.remove,1);renderChanges();
+  draft.splice(+b.dataset.remove,1);renderChanges();renderStateChoices();
  });
  $('changes').querySelectorAll('[data-name]').forEach(b=>b.oninput=()=>{
   draft[+b.dataset.name].name=b.value;
+ });
+ renderStateChoices();
+}
+function renderStateChoices(){
+ $('stateChoices').innerHTML=db.states.map(s=>`<button type="button" class="pill ${draft.some(c=>c.name===s)?'selected':''}" data-state="${esc(s)}">${esc(s)}</button>`).join('');
+ $('stateChoices').querySelectorAll('[data-state]').forEach(b=>b.onclick=()=>{
+  const s=b.dataset.state;
+  const i=draft.findIndex(c=>c.name===s);
+  if(i>=0)draft.splice(i,1);else draft.push({name:s,direction:'減った'});
+  renderChanges();
  });
 }
 function addState(){
  const s=$('newState').value.trim();if(!s)return;
  if(!db.states.includes(s))db.states.push(s);
- draft.push({name:s,direction:'増えた'});
+ if(!draft.some(c=>c.name===s))draft.push({name:s,direction:'増えた'});
  $('newState').value='';persist();renderChanges();
 }
 $('addState').onclick=addState;
-$('newState').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addState();}};
+$('newState').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addState()}};
 
+/* スコア */
 function updateScore(){
  $('beforeValue').textContent=$('before').value;
  $('afterValue').textContent=$('after').value;
@@ -330,22 +464,40 @@ function updateScore(){
 }
 $('before').oninput=updateScore;$('after').oninput=updateScore;
 
+const optionalLabels={later1:'later1Value',bedtime:'bedtimeValue',nextMorning:'nextMorningValue'};
+Object.keys(optionalLabels).forEach(id=>{
+ $(id).addEventListener('input',()=>{
+  optionalScores[id]=Number($(id).value);
+  $(optionalLabels[id]).textContent=$(id).value;
+ });
+});
+document.querySelectorAll('[data-clear-score]').forEach(b=>b.onclick=()=>{
+ const id=b.dataset.clearScore;optionalScores[id]=null;
+ $(optionalLabels[id]).textContent='—';
+});
+function setOptionalScores(r){
+ Object.keys(optionalScores).forEach(id=>{
+  optionalScores[id]=r&&r[id]!==null&&r[id]!==undefined&&r[id]!==''?Number(r[id]):null;
+  $(id).value=optionalScores[id]===null?50:optionalScores[id];
+  $(optionalLabels[id]).textContent=optionalScores[id]===null?'—':optionalScores[id];
+ });
+}
 function reset(){
  editing=null;selected=[];draft=[];
  $('form').reset();$('before').value=50;$('after').value=50;
  $('date').value=nowLocal();$('editId').value='';
+ $('sleepCondition').value='';$('company').value='';$('context').value='';
+ setOptionalScores(null);
  $('save').textContent='記録を保存';$('cancel').classList.add('hidden');
  renderActions();renderChanges();updateScore();
 }
 $('cancel').onclick=reset;
-$('newRecord').onclick=()=>{
- reset();document.querySelector('[data-tab="record"]').click();
- window.scrollTo({top:0,behavior:'smooth'});
-};
+$('newRecord').onclick=()=>{reset();goTab('record')};
 
+/* 保存 */
 $('form').onsubmit=e=>{
  e.preventDefault();
- if(!selected.length){alert('行動を1つ以上選択してください。');return;}
+ if(!selected.length){alert('行動を1つ以上選択してください。');return}
  const id=editing||(crypto.randomUUID?crypto.randomUUID():String(Date.now()));
  const previous=db.records.find(r=>r.id===id);
  const r={
@@ -354,137 +506,168 @@ $('form').onsubmit=e=>{
   date:$('date').value||nowLocal(),
   before:+$('before').value,after:+$('after').value,
   changes:draft.map(c=>({name:c.name.trim(),direction:c.direction})).filter(c=>c.name),
-  memo:$('memo').value.trim(),
+  sleepCondition:$('sleepCondition').value,company:$('company').value,
+  context:$('context').value.trim(),
+  later1:optionalScores.later1,bedtime:optionalScores.bedtime,
+  nextMorning:optionalScores.nextMorning,memo:$('memo').value.trim(),
   createdAt:previous?previous.createdAt:new Date().toISOString()
  };
  const i=db.records.findIndex(x=>x.id===id);
  if(i<0)db.records.push(r);else db.records[i]=r;
- persist();reset();renderHistory();renderAnalysis();
- document.querySelector('[data-tab="history"]').click();
+ persist();reset();renderHistory();renderAnalysis();renderFocusBanner();
+ goTab('history');
  alert(i<0?'記録を保存しました。':'記録を更新しました。');
 };
+function editRecord(id){
+ const r=db.records.find(x=>x.id===id);if(!r)return;
+ editing=id;selected=r.actions.slice();draft=(r.changes||[]).map(c=>({...c}));
+ $('before').value=r.before;$('after').value=r.after;
+ $('duration').value=r.duration??'';$('date').value=r.date;
+ $('memo').value=r.memo||'';$('sleepCondition').value=r.sleepCondition||'';
+ $('company').value=r.company||'';$('context').value=r.context||'';
+ $('save').textContent='変更を保存';$('cancel').classList.remove('hidden');
+ setOptionalScores(r);renderActions();renderChanges();updateScore();goTab('record');
+}
+function deleteRecord(id){
+ if(!confirm('この記録を削除しますか？'))return;
+ db.records=db.records.filter(r=>r.id!==id);persist();renderHistory();renderAnalysis();renderFocusBanner();
+}
 
+/* 履歴 */
 function renderFilter(){
  const old=$('filter').value;
  $('filter').innerHTML='<option value="">すべての行動</option>'+db.actions.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
  $('filter').value=db.actions.includes(old)?old:'';
 }
 $('filter').onchange=renderHistory;
-
 function renderHistory(){
- renderFilter();
- const f=$('filter').value;
+ renderFilter();const f=$('filter').value;
  const rs=db.records.filter(r=>!f||r.actions.includes(f)).slice().sort((a,b)=>b.date.localeCompare(a.date));
- if(!rs.length){$('records').innerHTML='<div class="empty">まだ記録がありません。</div>';return;}
+ if(!rs.length){$('records').innerHTML='<div class="empty">まだ記録がありません。</div>';return}
  $('records').innerHTML=rs.map(r=>{
   const d=change(r);
+  const later=[['1〜3時間後',r.later1],['就寝前',r.bedtime],['翌朝',r.nextMorning]].filter(x=>x[1]!==null&&x[1]!==undefined);
   return `<article class="item">
    <div class="itemtop"><div><b>${r.actions.map(esc).join('・')}</b><div class="hint">${esc(dateLabel(r.date))}${r.duration!==null?' · '+esc(r.duration)+'分':''}</div></div>
    <b class="${d<0?'good':d>0?'bad':''}">${d>0?'+':''}${d}点</b></div>
-   <p>実施前 <b>${r.before}</b> → 実施後 <b>${r.after}</b></p>
+   <p>実施前 <b>${r.before}</b> → 直後 <b>${r.after}</b></p>
    <div>${(r.changes||[]).map(c=>`<span class="tag">${esc(c.name)}：${esc(c.direction)}</span>`).join('')}</div>
+   ${r.sleepCondition?`<span class="tag">睡眠：${esc(r.sleepCondition)}</span>`:''}
+   ${r.company?`<span class="tag">${esc(r.company)}</span>`:''}
+   ${r.context?`<p class="hint">条件：${esc(r.context)}</p>`:''}
+   ${later.length?`<p class="hint">時間差：${later.map(x=>esc(x[0])+' '+x[1]+'点').join(' · ')}</p>`:''}
    ${r.memo?`<p style="white-space:pre-wrap;margin-top:8px">${esc(r.memo)}</p>`:''}
    <div class="toolbar" style="margin-top:10px">
-    <button class="btn small" data-edit="${esc(r.id)}">編集</button>
-    <button class="btn small danger" data-delete="${esc(r.id)}">削除</button>
-   </div>
+   <button class="btn small" data-edit="${esc(r.id)}">編集</button>
+   <button class="btn small danger" data-delete="${esc(r.id)}">削除</button></div>
   </article>`;
  }).join('');
  $('records').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editRecord(b.dataset.edit));
  $('records').querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>deleteRecord(b.dataset.delete));
 }
-function editRecord(id){
- const r=db.records.find(x=>x.id===id);if(!r)return;
- editing=id;selected=r.actions.slice();draft=(r.changes||[]).map(c=>({...c}));
- $('before').value=r.before;$('after').value=r.after;
- $('duration').value=r.duration??'';$('date').value=r.date;
- $('memo').value=r.memo||'';$('save').textContent='変更を保存';
- $('cancel').classList.remove('hidden');
- renderActions();renderChanges();updateScore();
- document.querySelector('[data-tab="record"]').click();
- window.scrollTo({top:0,behavior:'smooth'});
-}
-function deleteRecord(id){
- if(!confirm('この記録を削除しますか？'))return;
- db.records=db.records.filter(r=>r.id!==id);persist();renderHistory();renderAnalysis();
-}
 
+/* 分析 */
 function periodRecords(){
- const p=$('period').value;
- if(p==='all')return db.records.slice();
+ const p=$('period').value;if(p==='all')return db.records.slice();
  const cut=Date.now()-Number(p)*86400000;
  return db.records.filter(r=>new Date(r.date).getTime()>=cut);
 }
 $('period').onchange=renderAnalysis;
+$('actionAnalysisFilter').onchange=renderAnalysis;
+function renderAnalysisFilters(){
+ const old=$('actionAnalysisFilter').value;
+ $('actionAnalysisFilter').innerHTML='<option value="">すべての行動</option>'+db.actions.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+ $('actionAnalysisFilter').value=db.actions.includes(old)?old:'';
+}
 function groupsByAction(rs){
- const m={};
- rs.forEach(r=>r.actions.forEach(a=>(m[a]??=[]).push(r)));
- return m;
+ const m={};rs.forEach(r=>r.actions.forEach(a=>(m[a]??=[]).push(r)));return m;
 }
-function stats(rs){
- const ds=rs.map(change);
- return {n:ds.length,mean:mean(ds),relief:ds.filter(x=>x<0).length,
-  worse:ds.filter(x=>x>0).length,same:ds.filter(x=>x===0).length};
-}
-function metric(title,value,caption){
- return `<div class="metric"><div class="caption">${esc(title)}</div><div class="value">${esc(value)}</div><div class="caption">${esc(caption||'')}</div></div>`;
-}
+function band(n){return n<=33?'低（0〜33）':n<=66?'中（34〜66）':'高（67〜100）'}
 function renderAnalysis(){
+ renderAnalysisFilters();
  const rs=periodRecords(),s=stats(rs);
- $('overview').innerHTML=
-  metric('記録数',s.n+'件','選択期間')+
-  metric('平均変化量',avgLabel(s.mean),'マイナス＝軽減')+
-  metric('軽減した割合',percent(s.relief,s.n)+'%',s.relief+'件')+
-  metric('悪化した割合',percent(s.worse,s.n)+'%',s.worse+'件');
- renderActionAnalysis(rs);renderSeverity(rs);renderStates(rs);renderDurations(rs);renderHypotheses(rs);
+ $('overview').innerHTML=metric('記録数',s.n+'件','選択期間')+
+ metric('平均変化量',avgLabel(s.mean),'マイナス＝軽減')+
+ metric('軽減した割合',percent(s.relief,s.n)+'%',s.relief+'件')+
+ metric('悪化した割合',percent(s.worse,s.n)+'%',s.worse+'件');
+ const f=$('actionAnalysisFilter').value;
+ const filtered=f?rs.filter(r=>r.actions.includes(f)):rs;
+ renderActionAnalysis(filtered,f);renderSeverity(filtered);renderConditions(rs,f);
+ renderTime(filtered);renderStates(filtered);renderDurations(filtered);renderHypotheses(filtered);
 }
-function renderActionAnalysis(rs){
- const list=Object.entries(groupsByAction(rs)).map(([name,rs])=>({name,...stats(rs)})).sort((a,b)=>(a.mean??0)-(b.mean??0));
- if(!list.length){$('byAction').innerHTML='<div class="empty">記録が集まると行動別に分析します。</div>';return;}
- $('byAction').innerHTML=list.map(x=>`
- <div class="item">
-  <div class="itemtop"><b>${esc(x.name)}</b><b>${avgLabel(x.mean)}</b></div>
-  <div class="bar"><span class="${x.mean>0?'negative':''}" style="width:${Math.min(100,Math.abs(x.mean||0))}%"></span></div>
-  <div class="hint">${x.n}回 · 軽減 ${percent(x.relief,x.n)}% · 悪化 ${percent(x.worse,x.n)}% · 変化なし ${percent(x.same,x.n)}%</div>
- </div>`).join('');
+function renderActionAnalysis(rs,selectedAction){
+ const list=selectedAction?[[selectedAction,rs]]:Object.entries(groupsByAction(rs));
+ const data=list.map(([name,records])=>({name,...stats(records)})).sort((a,b)=>(a.mean??0)-(b.mean??0));
+ if(!data.length){$('byAction').innerHTML='<div class="empty">記録が集まると行動別に分析します。</div>';return}
+ $('byAction').innerHTML=data.map(x=>`
+ <div class="item"><div class="itemtop"><b>${esc(x.name)}</b><b>${avgLabel(x.mean)}</b></div>
+ <div class="bar"><span class="${x.mean>0?'negative':''}" style="width:${Math.min(100,Math.abs(x.mean||0))}%"></span></div>
+ <div class="hint">${x.n}回 · 軽減 ${percent(x.relief,x.n)}% · 悪化 ${percent(x.worse,x.n)}% · 変化なし ${percent(x.same,x.n)}%</div></div>`).join('');
 }
-function band(n){return n<=33?'低（0〜33）':n<=66?'中（34〜66）':'高（67〜100）';}
 function renderSeverity(rs){
  const names=['低（0〜33）','中（34〜66）','高（67〜100）'];
  const overall=names.map(n=>{
   const a=rs.filter(r=>band(r.before)===n),s=stats(a);
   return `<div class="item"><b>${n}</b><p>平均変化量：<b>${avgLabel(s.mean)}</b></p><div class="hint">${s.n}件 · 軽減 ${percent(s.relief,s.n)}% · 悪化 ${percent(s.worse,s.n)}%</div></div>`;
  }).join('');
- const perAction=[];
- Object.entries(groupsByAction(rs)).forEach(([name,a])=>names.forEach(n=>{
-  const subset=a.filter(r=>band(r.before)===n);
-  if(subset.length>=2)perAction.push({name,n,stats:stats(subset)});
- }));
- $('bySeverity').innerHTML=overall+
-  '<h3>行動 × しんどさの程度</h3>'+
-  (perAction.length?perAction.map(x=>`<p>${esc(x.name)}・${x.n}：<b>${avgLabel(x.stats.mean)}</b>（${x.stats.n}件）</p>`).join(''):'<p class="hint">同じ行動・同じ区分の記録が2件以上になると比較を表示します。</p>');
+ $('bySeverity').innerHTML=overall;
+}
+function renderConditions(rs,action){
+ const dimensions=[
+  {title:'睡眠・休息の状態',key:'sleepCondition'},
+  {title:'過ごし方',key:'company'},
+  {title:'時間帯',key:'time'}
+ ];
+ let html='';
+ dimensions.forEach(dim=>{
+  const groups={};
+  rs.forEach(r=>{
+   let v=dim.key==='time'?(r.date?new Date(r.date).getHours():null):r[dim.key];
+   if(v===null||v===undefined||v==='')return;
+   if(dim.key==='time')v=v<12?'午前':v<17?'午後':'夕方〜夜';
+   (groups[v]??=[]).push(r);
+  });
+  const entries=Object.entries(groups);
+  html+=`<h3>${dim.title}</h3>`;
+  html+=entries.length?entries.map(([name,a])=>{
+   const s=stats(a);
+   return `<div class="item"><div class="itemtop"><b>${esc(name)}</b><b>${avgLabel(s.mean)}</b></div><div class="hint">${s.n}件 · 軽減 ${percent(s.relief,s.n)}% · 悪化 ${percent(s.worse,s.n)}%</div></div>`;
+  }).join(''):'<p class="hint">この条件の記録はまだありません。</p>';
+ });
+ const contexts={};
+ rs.filter(r=>r.context).forEach(r=>(contexts[r.context]??=[]).push(r));
+ html+='<h3>自由記入の条件</h3>';
+ html+=Object.entries(contexts).map(([name,a])=>{
+  const s=stats(a);return `<div class="item"><b>${esc(name)}</b><p>${avgLabel(s.mean)}（${s.n}件）</p></div>`;
+ }).join('')||'<p class="hint">条件欄に記録すると集計されます。表現の違う記述は別々に集計します。</p>';
+ if(action)html=`<p class="hint">対象行動：${esc(action)}</p>`+html;
+ $('byConditions').innerHTML=html;
+}
+function renderTime(rs){
+ const stages=[['直後',r=>r.after],['1〜3時間後',r=>r.later1],['就寝前',r=>r.bedtime],['翌朝',r=>r.nextMorning]];
+ const base=mean(rs.map(r=>r.before));
+ $('byTime').innerHTML=stages.map(([name,get])=>{
+  const vals=rs.map(r=>get(r)).filter(v=>v!==null&&v!==undefined&&Number.isFinite(Number(v))).map(Number);
+  const avg=mean(vals),diff=avg===null||base===null?null:avg-base;
+  return `<div class="item"><div class="itemtop"><b>${name}</b><b>${avg===null?'—':avg.toFixed(1)+'点'}</b></div>
+  <div class="hint">${vals.length}件${diff===null?'':' · 実施前平均との比較 '+avgLabel(diff)}</div></div>`;
+ }).join('')+'<p class="hint">時間差の値は、記録した実際の経過時間が厳密に統一されているとは限りません。比較は参考値です。</p>';
 }
 function renderStates(rs){
  const map={};
  rs.forEach(r=>(r.changes||[]).forEach(c=>{
-  if(!c.name)return;
-  map[c.name]??={up:0,down:0};
+  if(!c.name)return;map[c.name]??={up:0,down:0};
   if(c.direction==='増えた')map[c.name].up++;else map[c.name].down++;
  }));
  const entries=Object.entries(map).sort((a,b)=>(b[1].up+b[1].down)-(a[1].up+a[1].down));
  $('byState').innerHTML=entries.length?entries.map(([name,v])=>`
  <div class="item"><div class="itemtop"><b>${esc(name)}</b><span>${v.up+v.down}回</span></div>
- <div class="hint">増えた ${v.up}回 · 減った ${v.down}回</div></div>`).join(''):
- '<div class="empty">状態の変化を記録すると、ここに集計されます。</div>';
+ <div class="hint">増えた ${v.up}回 · 減った ${v.down}回</div></div>`).join(''):'<div class="empty">状態の変化を記録すると、ここに集計されます。</div>';
 }
 function renderDurations(rs){
  const timed=rs.filter(r=>r.duration!==null&&Number.isFinite(Number(r.duration)));
- if(timed.length<2){$('byDuration').innerHTML='<div class="empty">実施時間の記録が2件以上集まると表示します。時間の入力は任意です。</div>';return;}
- const bins=[
-  {name:'短め（15分以下）',test:n=>n<=15},
-  {name:'中くらい（16〜60分）',test:n=>n>15&&n<=60},
-  {name:'長め（60分超）',test:n=>n>60}
- ];
+ if(!timed.length){$('byDuration').innerHTML='<div class="empty">実施時間の記録が集まると表示します。</div>';return}
+ const bins=[{name:'15分以下',test:n=>n<=15},{name:'16〜60分',test:n=>n>15&&n<=60},{name:'60分超',test:n=>n>60}];
  $('byDuration').innerHTML=bins.map(b=>{
   const a=timed.filter(r=>b.test(Number(r.duration))),s=stats(a);
   return `<div class="item"><b>${b.name}</b><p>平均変化量：<b>${avgLabel(s.mean)}</b></p><div class="hint">${s.n}件</div></div>`;
@@ -494,36 +677,103 @@ function renderHypotheses(rs){
  const out=[];
  Object.entries(groupsByAction(rs)).forEach(([name,a])=>{
   const s=stats(a);
-  if(a.length>=3&&s.mean<=-5&&s.relief/a.length>=.6)
-   out.push(`「${name}」は、記録上しんどさが軽減する傾向（${a.length}件、平均${avgLabel(s.mean)}）。`);
-  if(a.length>=3&&s.mean>=5&&s.worse/a.length>=.6)
-   out.push(`「${name}」は、記録上しんどさが増える傾向（${a.length}件、平均${avgLabel(s.mean)}）。`);
-  ['低（0〜33）','中（34〜66）','高（67〜100）'].forEach(n=>{
-   const subset=a.filter(r=>band(r.before)===n);
-   const x=stats(subset);
-   if(subset.length>=3&&x.mean<=-5)
-    out.push(`しんどさが${n}のとき、「${name}」の後に軽減する傾向（${subset.length}件、平均${avgLabel(x.mean)}）。`);
-  });
+  if(a.length>=3&&s.mean<=-5&&s.relief/a.length>=.6)out.push(`「${name}」は、記録上しんどさが軽減する傾向（${a.length}件、平均${avgLabel(s.mean)}）。`);
+  if(a.length>=3&&s.mean>=5&&s.worse/a.length>=.6)out.push(`「${name}」は、記録上しんどさが増える傾向（${a.length}件、平均${avgLabel(s.mean)}）。`);
  });
- const states={};
- rs.forEach(r=>(r.changes||[]).forEach(c=>{
-  states[c.name]??={up:0,down:0};
-  states[c.name][c.direction==='増えた'?'up':'down']++;
- }));
- Object.entries(states).forEach(([name,v])=>{
-  const n=v.up+v.down;
-  if(n>=3&&v.up/n>=.7)out.push(`「${name}」は増えたと記録されることが多い（${v.up}/${n}回）。`);
-  if(n>=3&&v.down/n>=.7)out.push(`「${name}」は減ったと記録されることが多い（${v.down}/${n}回）。`);
- });
- $('hypotheses').innerHTML=out.length?
- '<ul>'+out.map(x=>`<li style="margin:8px 0">${esc(x)}</li>`).join('')+'</ul><p class="hint">仮説は観察された傾向であり、原因や確実な効果を証明するものではありません。</p>':
- '<div class="empty">各行動・状態の記録が3件以上になると、仮説を表示します。まずは記録を集めましょう。</div>';
+ $('hypotheses').innerHTML=out.length?'<ul>'+out.map(x=>`<li style="margin:8px 0">${esc(x)}</li>`).join('')+'</ul><p class="hint">観察された傾向であり、原因や確実な効果を証明するものではありません。</p>':'<div class="empty">各行動の記録が3件以上になると、仮説を表示します。</div>';
 }
 
+/* 重点行動 */
+function focusBannerHTML(key,compact=false){
+ const f=db.focusWeeks[key];
+ const a=f?focusRecords(f,key):[];
+ const n=a.length,target=f?Math.max(1,Number(f.target)||1):1;
+ const pct=f?Math.min(100,Math.round(n/target*100)):0;
+ if(!f||!f.action){
+  return `<div class="focus-banner focus-empty">
+   <div class="focus-kicker">★ THIS WEEK ★</div>
+   <div class="focus-title">今週のミッション、募集中！！</div>
+   <p>今週は何を重点的に観察する？</p>
+   <div class="focus-actions"><button type="button" data-open-focus>重点行動を設定する →</button></div>
+  </div>`;
+ }
+ return `<div class="focus-banner">
+  <div class="focus-kicker">★ THIS WEEK'S MAIN QUEST ★</div>
+  <div class="focus-title">${esc(f.title||'今週はこれを重点的にやろう！！')}</div>
+  <div class="focus-purpose"><b>🎯 今週の重点行動：${esc(f.action)}</b>${f.purpose?'<br>'+esc(f.purpose):''}</div>
+  <div class="focus-count">📊 記録 ${n} / ${target} 回</div>
+  <div class="focus-track"><span style="width:${pct}%"></span></div>
+  <p style="font-weight:900">${pct>=100?'🎉 目標達成！ナイス観察！！':`目標まであと ${Math.max(0,target-n)} 回！`}</p>
+  <div class="focus-actions"><button type="button" data-open-focus>目標・振り返りを編集</button><button type="button" data-focus-record>この行動を記録する！</button></div>
+ </div>`;
+}
+function attachFocusBanner(container){
+ container.querySelectorAll('[data-open-focus]').forEach(b=>b.onclick=()=>goTab('focus'));
+ container.querySelectorAll('[data-focus-record]').forEach(b=>b.onclick=()=>{
+  reset();const f=currentFocus();
+  if(f&&db.actions.includes(f.action))selected=[f.action];
+  renderActions();goTab('record');
+ });
+}
+function renderFocusBanner(){
+ $('focusBanner').innerHTML=focusBannerHTML(weekStart());
+ attachFocusBanner($('focusBanner'));
+}
+function renderFocusPage(){
+ const key=weekStart(),f=db.focusWeeks[key];
+ $('focusManageBanner').innerHTML=focusBannerHTML(key);
+ attachFocusBanner($('focusManageBanner'));
+ $('focusAction').value=f?.action||'';
+ $('focusTitle').value=f?.title||'';
+ $('focusPurpose').value=f?.purpose||'';
+ $('focusTarget').value=f?.target||3;
+ $('focusReflection').value=f?.reflection||'';
+ renderFocusHistory();
+}
+$('saveFocus').onclick=()=>{
+ const action=$('focusAction').value.trim();
+ if(!action){alert('重点的に観察する行動を入力してください。');return}
+ if(!db.actions.includes(action)){db.actions.push(action)}
+ const key=weekStart(),old=db.focusWeeks[key]||{};
+ db.focusWeeks[key]={
+  action,title:$('focusTitle').value.trim(),purpose:$('focusPurpose').value.trim(),
+  target:Math.max(1,Math.min(100,Number($('focusTarget').value)||3)),
+  reflection:$('focusReflection').value.trim(),
+  createdAt:old.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()
+ };
+ persist();renderActions();renderFocusPage();renderFocusBanner();
+ alert('今週の重点行動を保存しました！');
+};
+$('clearFocus').onclick=()=>{
+ const key=weekStart();
+ if(!db.focusWeeks[key]){alert('今週の設定はありません。');return}
+ if(!confirm('今週の重点行動を解除しますか？過去の週の履歴は残ります。'))return;
+ delete db.focusWeeks[key];persist();renderFocusPage();renderFocusBanner();
+};
+function renderFocusHistory(){
+ const entries=Object.entries(db.focusWeeks).sort((a,b)=>b[0].localeCompare(a[0]));
+ if(!entries.length){$('focusHistory').innerHTML='<div class="empty">まだ重点行動の履歴がありません。今週のテーマを設定してみよう！</div>';return}
+ $('focusHistory').innerHTML=entries.map(([key,f])=>{
+  const a=focusRecords(f,key),target=Math.max(1,Number(f.target)||1);
+  return `<div class="item">
+   <div class="itemtop"><b>${esc(weekLabel(key))}</b><span class="status">${a.length}/${target}回</span></div>
+   <h3>${esc(f.title||f.action)}</h3>
+   <p><b>重点行動：</b>${esc(f.action)}</p>
+   ${f.purpose?`<p><b>目的：</b>${esc(f.purpose)}</p>`:''}
+   <div class="bar"><span style="width:${Math.min(100,a.length/target*100)}%"></span></div>
+   <p class="hint">記録 ${a.length}件 · 平均変化量 ${avgLabel(stats(a).mean)}</p>
+   ${f.reflection?`<div class="notice" style="margin-top:8px"><b>振り返り</b><p style="white-space:pre-wrap">${esc(f.reflection)}</p></div>`:'<p class="hint">振り返りはまだありません。</p>'}
+   ${key===weekStart()?'<span class="tag">今週</span>':''}
+  </div>`;
+ }).join('');
+}
+
+/* バックアップ・復元 */
 $('export').onclick=()=>{
  const blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});
  const url=URL.createObjectURL(blob),a=document.createElement('a');
- a.href=url;a.download='shindosa-log-backup.json';a.click();URL.revokeObjectURL(url);
+ a.href=url;a.download='shindosa-log-backup.json';document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 $('import').onclick=()=>$('file').click();
 $('file').onchange=async e=>{
@@ -532,17 +782,22 @@ $('file').onchange=async e=>{
   const x=JSON.parse(await f.text());
   if(!x||!Array.isArray(x.records)||!Array.isArray(x.actions)||!Array.isArray(x.states))throw Error();
   if(!confirm('現在のデータを読み込んだデータで置き換えますか？'))return;
-  db=x;persist();renderActions();renderHistory();renderAnalysis();alert('復元しました。');
- }catch(err){alert('有効なバックアップJSONではありません。');}
+  db={...x,focusWeeks:x.focusWeeks&&typeof x.focusWeeks==='object'?x.focusWeeks:{}};
+  persist();reset();renderHistory();renderAnalysis();renderFocusPage();renderFocusBanner();
+  alert('復元しました。');
+ }catch(err){alert('有効なバックアップJSONではありません。')}
  e.target.value='';
 };
 $('clear').onclick=()=>{
  if(!confirm('全記録を削除しますか？この操作は取り消せません。'))return;
- db.records=[];persist();renderHistory();renderAnalysis();
+ db.records=[];persist();renderHistory();renderAnalysis();renderFocusBanner();renderFocusPage();
 };
 
+/* 初期化 */
 $('date').value=nowLocal();
-renderActions();renderChanges();updateScore();renderFilter();renderHistory();renderAnalysis();
+renderActions();renderChanges();updateScore();setOptionalScores(null);
+renderFilter();renderAnalysisFilters();renderHistory();renderAnalysis();
+renderFocusPage();renderFocusBanner();
 })();
 </script>
 </body>
